@@ -1,0 +1,131 @@
+{
+    "success": true,
+    "message": "Operation Success",
+    "data": {
+        "ogrenciBilgisiList": [
+            {
+                "kisiBilgileri": {
+                    "tcKimlikNo": 99138059936,
+                    "adi": "MAHSA",
+                    "soyadi": "ESHTAB",
+                    "babaAdi": "BEHRUZ",
+                    "anneAdi": "MİNA",
+                    "dogumTarihi": "02/04/1991",
+                    "cinsiyeti": {
+                        "kod": 2,
+                        "ad": "Kadın",
+                        "aciklama": null
+                    },
+                    "uyrugu": {
+                        "kod": 9907,
+                        "ad": "İRAN İSLAM CUMHURİYETİ",
+                        "aciklama": null
+                    }
+                },
+                "ogrenciBilgileri": {
+                    "girisTuru": {
+                        "kod": 111,
+                        "ad": "Yüksek Lisans (Yurt dışı kontenjan)",
+                        "aciklama": null
+                    },
+                    "girisPuanTuru": {
+                        "kod": 29,
+                        "ad": "DİĞER (Giriş puan türü listede yok ise 29 kodu (DİĞER) girilecektir.)",
+                        "puan": "0",
+                        "aciklama": null
+                    },
+                    "kayitTarihi": "21/02/2023 00:00:00",
+                    "sinifi": {
+                        "kod": 9,
+                        "ad": "DERS AŞAMASI",
+                        "aciklama": null
+                    },
+                    "gano": {
+                        "not": 3.42,
+                        "notSistem": 4.0,
+                        "aciklama": null
+                    },
+                    "ogrencilikStatusu": {
+                        "kod": 21,
+                        "ad": "KAYDI SİLİNMİŞTİR. (AYRILAN ÖĞRENCİLER)",
+                        "aciklama": null
+                    },
+                    "ogrencilikHakki": {
+                        "kod": 2,
+                        "ad": "Yok",
+                        "aciklama": null
+                    },
+                    "ogrencilikHakkiBittigiTarih": "06/03/2025",
+                    "ayrilmaNedeni": {
+                        "kod": 6,
+                        "ad": "Diğer",
+                        "aciklama": null
+                    },
+                    "ayrilmaTarihi": "06/03/2025",
+                    "akts": 0.0,
+                    "engelTuru": null,
+                    "denklik": null,
+                    "durum": "KAYDI SİLİNMİŞTİR. (AYRILAN ÖĞRENCİLER) - DİĞER"
+                },
+                "birimBilgileri": {
+                    "universiteTuru": {
+                        "kod": 1,
+                        "ad": "DEVLET ÜNİVERSİTELERİ",
+                        "aciklama": null
+                    },
+                    "universite": {
+                        "kod": 362386,
+                        "ad": "BURSA ULUDAĞ ÜNİVERSİTESİ",
+                        "aciklama": null
+                    },
+                    "fakulteYoMyoEnstitu": {
+                        "kod": 363817,
+                        "ad": "SOSYAL BİLİMLER ENSTİTÜSÜ",
+                        "aciklama": null
+                    },
+                    "birimId": 363895,
+                    "birimTuru": {
+                        "kod": 16,
+                        "ad": "Tezli Yüksek Lisans Programı",
+                        "aciklama": null
+                    },
+                    "bagliOlduguBirimId": 363817,
+                    "birimAdi": "ULUSLARARASI TİCARET (YL) (TEZLİ)",
+                    "ogrenimSuresi": 2,
+                    "ogrenimTuru": {
+                        "kod": 1,
+                        "ad": "ÖRGÜN ÖĞRETİM",
+                        "aciklama": null
+                    },
+                    "ogrenimDili": {
+                        "kod": 1,
+                        "ad": "Türkçe",
+                        "aciklama": null
+                    },
+                    "il": {
+                        "kod": 16,
+                        "ad": "BURSA",
+                        "aciklama": null
+                    },
+                    "ilce": {
+                        "kod": 1829,
+                        "ad": "NİLÜFER",
+                        "aciklama": null
+                    },
+                    "kilavuzKodu": null,
+                    "birimGrubu": {
+                        "kod": 5607,
+                        "ad": "ULUSLARARASI TİCARET",
+                        "aciklama": null
+                    }
+                }
+            }
+        ],
+        "sonuc": {
+            "sonuc": true,
+            "disSistemSonucKod": null,
+            "sonucMesaj": "İşlem başarıyla gerçekleştirilmiştir."
+        }
+    },
+    "errorDetails": null
+}
