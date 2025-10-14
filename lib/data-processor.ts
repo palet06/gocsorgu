@@ -8,10 +8,10 @@ import {
 import type { ApiResponse, QueryResult } from "@/types"
 
 export function processApiResponse(kimlikNo: string, response: ApiResponse): QueryResult {
-  console.log("[v0] processApiResponse called with:", { kimlikNo, response })
+  
 
   if (!response.success || !response.data) {
-    console.log("[v0] Response not successful or no data:", { success: response.success, hasData: !!response.data })
+    
     return {
       ykn: kimlikNo,
       ad: "Veri Yok",
@@ -24,7 +24,7 @@ export function processApiResponse(kimlikNo: string, response: ApiResponse): Que
   }
 
   const data = response.data
-  console.log("[v0] Processing data:", data)
+  
 
   // Basic info - fields are nested under data.kisi
   const kisi = data.kisi || {}
@@ -32,34 +32,55 @@ export function processApiResponse(kimlikNo: string, response: ApiResponse): Que
   const ad = kisi.ad || "Veri Yok"
   const soyad = kisi.soyad || "Veri Yok"
 
-  console.log("[v0] Extracted basic info:", { ykn, ad, soyad })
-  console.log("[v0] Raw field values:", {
-    yabanciKimlikNo: kisi.yabanciKimlikNo,
-    ad: kisi.ad,
-    soyad: kisi.soyad,
-    ikametOzetListExists: !!kisi.ikametOzetList,
-    ikametOzetListLength: kisi.ikametOzetList?.length,
-    ikametIzniBilgileriListExists: !!data.ikametIzniBilgileriList,
-    ikametIzniBilgileriListLength: data.ikametIzniBilgileriList?.length,
-  })
 
   // Find the latest record from ikametOzetList (under kisi)
   let latestOzetRecord = null
   let latestDate = new Date(0)
 
   if (kisi.ikametOzetList && kisi.ikametOzetList.length > 0) {
-    console.log("[v0] Processing ikametOzetList:", kisi.ikametOzetList)
+
+    const today = new Date()
     for (const record of kisi.ikametOzetList) {
-      console.log("[v0] Processing ozet record:", record)
+
       try {
-        const date = new Date(record.bitisTarihi)
-        if (!isNaN(date.getTime()) && date > latestDate) {
-          latestDate = date
-          latestOzetRecord = record
-          console.log("[v0] Found newer ozet record:", { date, record })
+        // Check if baslangicTarihi exists
+        if (!record.baslangicTarihi) {
+
+          continue
+        }
+
+        if (record.sonlandirmaTarihi || record.iptalTarihi || record.iptalSonlandirmaTarihi) {
+          
+          continue
+        }
+
+        // Check if bitisTarihi is null or in the future
+        let isActive = false
+        if (!record.bitisTarihi) {
+          // No end date means it's still active
+          isActive = true
+          
+        } else {
+          const bitisDate = new Date(record.bitisTarihi)
+          if (!isNaN(bitisDate.getTime()) && bitisDate > today) {
+            // End date is in the future
+            isActive = true
+           
+          } else {
+           
+          }
+        }
+
+        if (isActive) {
+          const date = record.bitisTarihi ? new Date(record.bitisTarihi) : new Date(8640000000000000) // Max date if no end date
+          if (!isNaN(date.getTime()) && date > latestDate) {
+            latestDate = date
+            latestOzetRecord = record
+           
+          }
         }
       } catch (error) {
-        console.log("[v0] Error processing ozet record date:", error)
+        
       }
     }
   }
@@ -69,15 +90,16 @@ export function processApiResponse(kimlikNo: string, response: ApiResponse): Que
   let gerekce = "Veri Yok"
 
   if (latestOzetRecord) {
-    console.log("[v0] Using latest ozet record:", latestOzetRecord)
+    
     izinTuru = latestOzetRecord.verilisNedeni || "Veri Yok"
-    izinBitisTarihi = formatDate(latestOzetRecord.bitisTarihi)
+    izinBitisTarihi = (latestOzetRecord.bitisTarihi ? formatDate(latestOzetRecord.bitisTarihi):"İzin Bitiş Tarihi Yok") || (latestOzetRecord.iptalSonlandirmaTarihi?formatDate(latestOzetRecord.iptalSonlandirmaTarihi): "İzin Bitiş Tarihi Yok")
+    
 
     // Process gerekce according to complex rules
     gerekce = processGerekce(latestOzetRecord.verilisNedeni, data.ikametIzniBilgileriList)
-    console.log("[v0] Processed values:", { izinTuru, izinBitisTarihi, gerekce })
+    
   } else {
-    console.log("[v0] No latest ozet record found")
+    
   }
 
   const result = {
@@ -90,18 +112,15 @@ export function processApiResponse(kimlikNo: string, response: ApiResponse): Que
     status: "Başarılı",
   }
 
-  console.log("[v0] Final processed result:", result)
+  
   return result
 }
 
 function processGerekce(verilisNedeni: string, ikametIzniBilgileriList: any[]): string {
-  console.log("[v0] processGerekce called with:", {
-    verilisNedeni,
-    ikametIzniBilgileriListLength: ikametIzniBilgileriList?.length,
-  })
+ 
 
   if (!ikametIzniBilgileriList || ikametIzniBilgileriList.length === 0) {
-    console.log("[v0] No ikametIzniBilgileriList data")
+ 
     return "Veri Yok"
   }
 
@@ -111,13 +130,13 @@ function processGerekce(verilisNedeni: string, ikametIzniBilgileriList: any[]): 
 
   console.log("[v0] Processing ikametIzniBilgileriList:", ikametIzniBilgileriList)
   for (const record of ikametIzniBilgileriList) {
-    console.log("[v0] Processing izin record:", record)
+ 
     try {
       const date = new Date(record.bitisTarihi)
       if (!isNaN(date.getTime()) && date > latestDate) {
         latestDate = date
         latestIzinRecord = record
-        console.log("[v0] Found newer izin record:", { date, record })
+ 
       }
     } catch (error) {
       console.log("[v0] Error processing izin record date:", error)
@@ -125,11 +144,11 @@ function processGerekce(verilisNedeni: string, ikametIzniBilgileriList: any[]): 
   }
 
   if (!latestIzinRecord) {
-    console.log("[v0] No latest izin record found")
+    
     return "Veri Yok"
   }
 
-  console.log("[v0] Using latest izin record for gerekce:", latestIzinRecord)
+  
 
   // Rule 1: If verilisNedeni is "Aile", check aileDestekleyiciTur first
   if (verilisNedeni === "Aile" && latestIzinRecord.aileDestekleyiciTur) {
@@ -143,43 +162,43 @@ function processGerekce(verilisNedeni: string, ikametIzniBilgileriList: any[]): 
 
   // Check other fields in priority order
   if (latestIzinRecord.kisaDonemKalisNeden) {
-    console.log("[v0] Checking kisaDonemKalisNeden:", latestIzinRecord.kisaDonemKalisNeden)
+    
     const mapped = kisaDonemNedenleri[latestIzinRecord.kisaDonemKalisNeden as keyof typeof kisaDonemNedenleri]
     if (mapped) {
-      console.log("[v0] Found kisaDonemKalisNeden mapping:", mapped)
+      
       return mapped + " (Kısa Dönem)"
     }
   }
 
   if (latestIzinRecord.ogrenciKalisNeden) {
-    console.log("[v0] Checking ogrenciKalisNeden:", latestIzinRecord.ogrenciKalisNeden)
+    
     const mapped = ogrenciKalisNeden[latestIzinRecord.ogrenciKalisNeden as keyof typeof ogrenciKalisNeden]
     if (mapped) {
-      console.log("[v0] Found ogrenciKalisNeden mapping:", mapped)
+    
       return mapped + " (Öğrenci)"
     }
   }
 
   if (latestIzinRecord.insaniIkametIzniKalisNeden) {
-    console.log("[v0] Checking insaniIkametIzniKalisNeden:", latestIzinRecord.insaniIkametIzniKalisNeden)
+    
     const mapped =
       insaniIkametNedenleri[latestIzinRecord.insaniIkametIzniKalisNeden as keyof typeof insaniIkametNedenleri]
     if (mapped) {
-      console.log("[v0] Found insaniIkametIzniKalisNeden mapping:", mapped)
+      
       return mapped + " (İnsani)"
     }
   }
 
   if (latestIzinRecord.turkSoylu) {
-    console.log("[v0] Checking turkSoylu:", latestIzinRecord.turkSoylu)
+    
     const mapped = uzunDonemTurkSoylu[latestIzinRecord.turkSoylu as keyof typeof uzunDonemTurkSoylu]
     if (mapped) {
-      console.log("[v0] Found turkSoylu mapping:", mapped)
+      
       return mapped + " (Uzun Dönem)"
     }
   }
 
-  console.log("[v0] No gerekce mapping found, returning 'Veri Yok'")
+  
   return "Veri Yok"
 }
 
