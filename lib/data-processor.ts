@@ -90,6 +90,7 @@ export function processApiResponse(kimlikNo: string, response: ApiResponse): Que
   let gerekce = "Veri Yok"
 
   if (latestOzetRecord) {
+    console.log("latest record",latestOzetRecord)
     
     izinTuru = latestOzetRecord.verilisNedeni || "Veri Yok"
     izinBitisTarihi = (latestOzetRecord.bitisTarihi ? formatDate(latestOzetRecord.bitisTarihi):"İzin Bitiş Tarihi Yok") || (latestOzetRecord.iptalSonlandirmaTarihi?formatDate(latestOzetRecord.iptalSonlandirmaTarihi): "İzin Bitiş Tarihi Yok")

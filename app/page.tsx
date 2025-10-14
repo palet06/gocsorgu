@@ -48,7 +48,7 @@ export default function HomePage() {
     setIdentityNumbers(numbers)
     setStats((prev) => ({ ...prev, total: numbers.length }))
 
-    console.log("[v0] Parsed identity numbers:", numbers)
+    
   }, [])
 
   const addLog = useCallback((entry: LogEntry) => {
@@ -59,9 +59,7 @@ export default function HomePage() {
     const startTime = Date.now()
 
     try {
-      console.log("[v0] About to make fetch request for:", kimlikNo)
-      console.log("[v0] Fetch URL:", "/api/query")
-      console.log("[v0] Fetch body:", JSON.stringify({ kimlikNo }))
+      
 
       const response = await fetch("/api/query", {
         method: "POST",
@@ -71,28 +69,19 @@ export default function HomePage() {
         body: JSON.stringify({ kimlikNo }),
       })
 
-      console.log("[v0] Fetch response received:", response.status, response.statusText)
+      
 
       const responseTime = Date.now() - startTime
 
       if (!response.ok) {
-        console.log("[v0] Response not OK:", response.status, response.statusText)
+        
         throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
 
       const data = await response.json()
-      console.log("[v0] Raw API response data:", JSON.stringify(data, null, 2))
-      console.log("[v0] Response structure check:")
-      console.log("  - data.success:", data.success)
-      console.log("  - data.data exists:", !!data.data)
+      
       if (data.data) {
-        console.log("  - data.data.yabanciKimlikNo:", data.data.yabanciKimlikNo)
-        console.log("  - data.data.ad:", data.data.ad)
-        console.log("  - data.data.soyad:", data.data.soyad)
-        console.log("  - data.data.ikametOzetList exists:", !!data.data.ikametOzetList)
-        console.log("  - data.data.ikametOzetList length:", data.data.ikametOzetList?.length)
-        console.log("  - data.data.ikametIzniBilgileriList exists:", !!data.data.ikametIzniBilgileriList)
-        console.log("  - data.data.ikametIzniBilgileriList length:", data.data.ikametIzniBilgileriList?.length)
+        
       }
 
       addLog({
@@ -104,7 +93,7 @@ export default function HomePage() {
       })
 
       const processedResult = processApiResponse(kimlikNo, data)
-      console.log("[v0] Processed result:", processedResult)
+      
 
       return processedResult
     } catch (error) {
@@ -134,7 +123,7 @@ export default function HomePage() {
   }
 
   const startQuery = async () => {
-    console.log("[v0] startQuery called, identityNumbers:", identityNumbers)
+    
     if (identityNumbers.length === 0) {
       alert("Lütfen geçerli kimlik numaraları girin!")
       return
@@ -161,10 +150,10 @@ export default function HomePage() {
         if (!isQueryingRef.current) break
 
         const kimlikNo = identityNumbers[i]
-        console.log("[v0] Processing identity number:", kimlikNo, `(${i + 1}/${identityNumbers.length})`)
+        
 
         const result = await queryIdentityNumber(kimlikNo)
-        console.log("[v0] Query result:", result)
+        
 
         setResults((prev) => [...prev, result])
 
@@ -331,9 +320,7 @@ export default function HomePage() {
               {!isQuerying ? (
                 <Button
                   onClick={() => {
-                    console.log("[v0] Start button clicked")
-                    console.log("[v0] Current identityNumbers:", identityNumbers)
-                    console.log("[v0] identityNumbers.length:", identityNumbers.length)
+                   
                     startQuery().catch((error) => {
                       console.error("[v0] Unhandled error in startQuery:", error)
                       alert(`Beklenmeyen hata: ${error instanceof Error ? error.message : "Bilinmeyen hata"}`)
