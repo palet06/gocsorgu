@@ -122,58 +122,114 @@ export default function HomePage() {
     }
   }
 
-  const startQuery = async () => {
+  // const startQuery = async () => {
     
-    if (identityNumbers.length === 0) {
-      alert("Lütfen geçerli kimlik numaraları girin!")
-      return
-    }
+  //   if (identityNumbers.length === 0) {
+  //     alert("Lütfen geçerli kimlik numaraları girin!")
+  //     return
+  //   }
 
-    setIsQuerying(true)
-    isQueryingRef.current = true
-    setIsPaused(false)
-    isPausedRef.current = false
-    setResults([])
-    setStats((prev) => ({ ...prev, completed: 0, failed: 0, progress: 0 }))
-    setStartTime(new Date())
-    setEndTime(null)
+  //   setIsQuerying(true)
+  //   isQueryingRef.current = true
+  //   setIsPaused(false)
+  //   isPausedRef.current = false
+  //   setResults([])
+  //   setStats((prev) => ({ ...prev, completed: 0, failed: 0, progress: 0 }))
+  //   setStartTime(new Date())
+  //   setEndTime(null)
 
-    try {
-      for (let i = 0; i < identityNumbers.length; i++) {
-        if (isPausedRef.current) {
-          // bekleme döngüsü ref üzerinden kontrol ediliyor
-          while (isPausedRef.current && isQueryingRef.current) {
-            await new Promise((r) => setTimeout(r, 100))
-          }
-        }
+  //   try {
+  //     for (let i = 0; i < identityNumbers.length; i++) {
+  //       if (isPausedRef.current) {
+  //         // bekleme döngüsü ref üzerinden kontrol ediliyor
+  //         while (isPausedRef.current && isQueryingRef.current) {
+  //           await new Promise((r) => setTimeout(r, 100))
+  //         }
+  //       }
 
-        if (!isQueryingRef.current) break
+  //       if (!isQueryingRef.current) break
 
-        const kimlikNo = identityNumbers[i]
+  //       const kimlikNo = identityNumbers[i]
         
 
-        const result = await queryIdentityNumber(kimlikNo)
+  //       const result = await queryIdentityNumber(kimlikNo)
         
 
-        setResults((prev) => [...prev, result])
+  //       setResults((prev) => [...prev, result])
 
-        setStats((prev) => {
-          const completed = prev.completed + 1
-          const failed = result.status === "Hata" ? prev.failed + 1 : prev.failed
-          const progress = (completed / prev.total) * 100
-          return { ...prev, completed, failed, progress }
-        })
+  //       setStats((prev) => {
+  //         const completed = prev.completed + 1
+  //         const failed = result.status === "Hata" ? prev.failed + 1 : prev.failed
+  //         const progress = (completed / prev.total) * 100
+  //         return { ...prev, completed, failed, progress }
+  //       })
 
-        if (i < identityNumbers.length - 1 && delay > 0) {
-          await new Promise((resolve) => setTimeout(resolve, delay))
+  //       if (i < identityNumbers.length - 1 && delay > 0) {
+  //         await new Promise((resolve) => setTimeout(resolve, delay))
+  //       }
+  //     }
+  //   } finally {
+  //     setIsQuerying(false)
+  //     isQueryingRef.current = false
+  //     setEndTime(new Date())
+  //   }
+  // }
+
+  const startQuery = async () => {
+  if (identityNumbers.length === 0) {
+    alert("Lütfen geçerli kimlik numaraları girin!")
+    return
+  }
+
+  setIsQuerying(true)
+  isQueryingRef.current = true
+  setIsPaused(false)
+  isPausedRef.current = false
+  setResults([])
+  setStats((prev) => ({ ...prev, completed: 0, failed: 0, progress: 0 }))
+  setStartTime(new Date())
+  setEndTime(null)
+
+  const batchSize = 10
+
+  try {
+    for (let i = 0; i < identityNumbers.length; i += batchSize) {
+      if (!isQueryingRef.current) break
+
+      if (isPausedRef.current) {
+        while (isPausedRef.current && isQueryingRef.current) {
+          await new Promise((r) => setTimeout(r, 100))
         }
       }
-    } finally {
-      setIsQuerying(false)
-      isQueryingRef.current = false
-      setEndTime(new Date())
+
+      const batch = identityNumbers.slice(i, i + batchSize)
+
+      const batchResults = await Promise.all(
+        batch.map((kimlikNo) => queryIdentityNumber(kimlikNo))
+      )
+
+      setResults((prev) => [...prev, ...batchResults])
+
+      setStats((prev) => {
+        const completed = prev.completed + batchResults.length
+        const failed =
+          prev.failed +
+          batchResults.filter((r) => r.status === "Hata").length
+        const progress = (completed / prev.total) * 100
+        return { ...prev, completed, failed, progress }
+      })
+
+      if (i + batchSize < identityNumbers.length && delay > 0) {
+        await new Promise((resolve) => setTimeout(resolve, delay))
+      }
     }
+  } finally {
+    setIsQuerying(false)
+    isQueryingRef.current = false
+    setEndTime(new Date())
   }
+}
+
 
   const pauseQuery = () => {
     setIsPaused((prev) => {
