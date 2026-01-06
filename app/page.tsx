@@ -110,7 +110,13 @@ export default function HomePage() {
         soyad: "Veri Yok",
         izinTuru: "Veri Yok",
         gerekce: `API Hatası: ${errorMessage}`,
+        izinBaslangicTarihi: "Veri Yok",
         izinBitisTarihi: "Veri Yok",
+        pasaportNo: "Veri Yok",
+        pasaportDuzenlemeTarihi: "Veri Yok",
+        pasaportGecerlilikTarihi: "Veri Yok",
+        pasaportVerenMakam: "Veri Yok",
+        pasaportVerenUlke: "Veri Yok",
         status: "Hata",
       };
     }
@@ -182,7 +188,7 @@ export default function HomePage() {
     setStartTime(new Date());
     setEndTime(null);
 
-    const batchSize = 10;
+    const batchSize = 20;
 
     try {
       for (let i = 0; i < identityNumbers.length; i += batchSize) {
@@ -261,7 +267,7 @@ export default function HomePage() {
       {/* Header */}
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold">
-          EGM Giriş/Çıkış Sorgulama Sistemi
+          İkamet Statü Sorgulama Sistemi
         </h1>
         <div className="flex justify-center gap-8 text-sm text-muted-foreground">
           <div>
@@ -284,8 +290,7 @@ export default function HomePage() {
           <div className="space-y-2">
             <Textarea
               placeholder={`Bilgileri girin (her satıra bir nesne veya virgülle ayırın)
-Örnek:
-{"egmCountryCode": "SRB", "passportNo": "123456789"}`}
+Örnek:`}
               value={inputText}
               onChange={(e) => {
                 setInputText(e.target.value);
@@ -441,10 +446,10 @@ export default function HomePage() {
       {/* Results and Logs */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <ResultsTable results={results} />
+          {/* <ResultsTable results={results} /> */}
         </div>
         <div>
-          <QueryLogs logs={logs} />
+          {/* <QueryLogs logs={logs} /> */}
         </div>
       </div>
     </div>
