@@ -12,7 +12,13 @@ export function exportToExcel(results: QueryResult[]) {
     Soyad: result.soyad,
     "İzin Türü": result.izinTuru,
     Gerekçe: result.gerekce,
+    "İzin Başlangıç Tarihi": result.izinBaslangicTarihi,
     "İzin Bitiş Tarihi": result.izinBitisTarihi,
+    "Pasaport No": result.pasaportNo,
+    "Pasaport Düzenleme Tarihi": result.pasaportDuzenlemeTarihi,
+    "Pasaport Geçerlilik Tarihi": result.pasaportGecerlilikTarihi,
+    "Pasaport Veren Makam": result.pasaportVerenMakam,
+    "Pasaport Veren Ülke": result.pasaportVerenUlke,
     Durum: result.status,
   }))
 

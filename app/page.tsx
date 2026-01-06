@@ -1,87 +1,81 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useCallback, useRef } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Progress } from "@/components/ui/progress"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Download, Play, Pause, Square, Upload } from "lucide-react"
-import { ResultsTable } from "@/components/results-table"
-import { QueryLogs } from "@/components/query-logs"
-import { exportToExcel } from "@/lib/excel-export"
-import { processApiResponse } from "@/lib/data-processor"
-import { formatDateTime } from "@/lib/utils"
-import type { QueryResult, LogEntry } from "@/types"
+import { useState, useCallback, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Progress } from "@/components/ui/progress";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Download, Play, Pause, Square, Upload } from "lucide-react";
+import { ResultsTable } from "@/components/results-table";
+import { QueryLogs } from "@/components/query-logs";
+import { exportToExcel } from "@/lib/excel-export";
+import { processApiResponse } from "@/lib/data-processor";
+import { formatDateTime } from "@/lib/utils";
+import type { QueryResult, LogEntry } from "@/types";
 
 export default function HomePage() {
-  const [identityNumbers, setIdentityNumbers] = useState<string[]>([])
-  const [inputText, setInputText] = useState("")
-  const [delay, setDelay] = useState(300)
-  const [concurrency, setConcurrency] = useState(1)
-  const [isQuerying, setIsQuerying] = useState(false)
-  const [isPaused, setIsPaused] = useState(false)
-  const [results, setResults] = useState<QueryResult[]>([])
-  const [logs, setLogs] = useState<LogEntry[]>([])
+  const [identityNumbers, setIdentityNumbers] = useState<string[]>([]);
+  const [inputText, setInputText] = useState("");
+  const [delay, setDelay] = useState(300);
+  const [concurrency, setConcurrency] = useState(1);
+  const [isQuerying, setIsQuerying] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [results, setResults] = useState<QueryResult[]>([]);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
   const [stats, setStats] = useState({
     total: 0,
     completed: 0,
     failed: 0,
     progress: 0,
-  })
+  });
 
-  const isQueryingRef = useRef(false)
-  const isPausedRef = useRef(false)
+  const isQueryingRef = useRef(false);
+  const isPausedRef = useRef(false);
 
-  const [startTime, setStartTime] = useState<Date | null>(null)
-  const [endTime, setEndTime] = useState<Date | null>(null)
+  const [startTime, setStartTime] = useState<Date | null>(null);
+  const [endTime, setEndTime] = useState<Date | null>(null);
 
   const parseIdentityNumbers = useCallback((text: string) => {
     const numbers = text
       .split(/[\n,;|\s]+/)
       .map((num) => num.trim())
       .filter((num) => num.length > 0)
-      .filter((num) => /^\d{6,}$/.test(num)) // 6 veya daha fazla rakam kabul
+      .filter((num) => /^\d{6,}$/.test(num)); // 6 veya daha fazla rakam kabul
 
-    setIdentityNumbers(numbers)
-    setStats((prev) => ({ ...prev, total: numbers.length }))
-
-    
-  }, [])
+    setIdentityNumbers(numbers);
+    setStats((prev) => ({ ...prev, total: numbers.length }));
+  }, []);
 
   const addLog = useCallback((entry: LogEntry) => {
-    setLogs((prev) => [entry, ...prev.slice(0, 99)]) // Keep last 100 logs
-  }, [])
+    setLogs((prev) => [entry, ...prev.slice(0, 99)]); // Keep last 100 logs
+  }, []);
 
-  const queryIdentityNumber = async (kimlikNo: string): Promise<QueryResult> => {
-    const startTime = Date.now()
+  const queryIdentityNumber = async (
+    kimlikNo: string
+  ): Promise<QueryResult> => {
+    const startTime = Date.now();
 
     try {
-      
-
       const response = await fetch("/api/query", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ kimlikNo }),
-      })
+      });
 
-      
-
-      const responseTime = Date.now() - startTime
+      const responseTime = Date.now() - startTime;
 
       if (!response.ok) {
-        
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const data = await response.json()
-      
+      const data = await response.json();
+
       if (data.data) {
-        
       }
 
       addLog({
@@ -90,16 +84,16 @@ export default function HomePage() {
         responseCode: response.status,
         responseTime,
         timestamp: new Date(),
-      })
+      });
 
-      const processedResult = processApiResponse(kimlikNo, data)
-      
+      const processedResult = processApiResponse(kimlikNo, data);
 
-      return processedResult
+      return processedResult;
     } catch (error) {
-      console.error("[v0] Error in queryIdentityNumber:", error)
-      const responseTime = Date.now() - startTime
-      const errorMessage = error instanceof Error ? error.message : "Bilinmeyen hata"
+      console.error("[v0] Error in queryIdentityNumber:", error);
+      const responseTime = Date.now() - startTime;
+      const errorMessage =
+        error instanceof Error ? error.message : "Bilinmeyen hata";
 
       addLog({
         kimlikNo,
@@ -108,7 +102,7 @@ export default function HomePage() {
         responseTime,
         error: errorMessage,
         timestamp: new Date(),
-      })
+      });
 
       return {
         ykn: kimlikNo,
@@ -118,12 +112,12 @@ export default function HomePage() {
         gerekce: `API Hatası: ${errorMessage}`,
         izinBitisTarihi: "Veri Yok",
         status: "Hata",
-      }
+      };
     }
-  }
+  };
 
   // const startQuery = async () => {
-    
+
   //   if (identityNumbers.length === 0) {
   //     alert("Lütfen geçerli kimlik numaraları girin!")
   //     return
@@ -150,10 +144,8 @@ export default function HomePage() {
   //       if (!isQueryingRef.current) break
 
   //       const kimlikNo = identityNumbers[i]
-        
 
   //       const result = await queryIdentityNumber(kimlikNo)
-        
 
   //       setResults((prev) => [...prev, result])
 
@@ -176,106 +168,109 @@ export default function HomePage() {
   // }
 
   const startQuery = async () => {
-  if (identityNumbers.length === 0) {
-    alert("Lütfen geçerli kimlik numaraları girin!")
-    return
-  }
+    if (identityNumbers.length === 0) {
+      alert("Lütfen geçerli kimlik numaraları girin!");
+      return;
+    }
 
-  setIsQuerying(true)
-  isQueryingRef.current = true
-  setIsPaused(false)
-  isPausedRef.current = false
-  setResults([])
-  setStats((prev) => ({ ...prev, completed: 0, failed: 0, progress: 0 }))
-  setStartTime(new Date())
-  setEndTime(null)
+    setIsQuerying(true);
+    isQueryingRef.current = true;
+    setIsPaused(false);
+    isPausedRef.current = false;
+    setResults([]);
+    setStats((prev) => ({ ...prev, completed: 0, failed: 0, progress: 0 }));
+    setStartTime(new Date());
+    setEndTime(null);
 
-  const batchSize = 10
+    const batchSize = 10;
 
-  try {
-    for (let i = 0; i < identityNumbers.length; i += batchSize) {
-      if (!isQueryingRef.current) break
+    try {
+      for (let i = 0; i < identityNumbers.length; i += batchSize) {
+        if (!isQueryingRef.current) break;
 
-      if (isPausedRef.current) {
-        while (isPausedRef.current && isQueryingRef.current) {
-          await new Promise((r) => setTimeout(r, 100))
+        if (isPausedRef.current) {
+          while (isPausedRef.current && isQueryingRef.current) {
+            await new Promise((r) => setTimeout(r, 100));
+          }
+        }
+
+        const batch = identityNumbers.slice(i, i + batchSize);
+
+        const batchResults = await Promise.all(
+          batch.map((kimlikNo) => queryIdentityNumber(kimlikNo))
+        );
+
+        setResults((prev) => [...prev, ...batchResults]);
+
+        setStats((prev) => {
+          const completed = prev.completed + batchResults.length;
+          const failed =
+            prev.failed +
+            batchResults.filter((r) => r.status === "Hata").length;
+          const progress = (completed / prev.total) * 100;
+          return { ...prev, completed, failed, progress };
+        });
+
+        if (i + batchSize < identityNumbers.length && delay > 0) {
+          await new Promise((resolve) => setTimeout(resolve, delay));
         }
       }
-
-      const batch = identityNumbers.slice(i, i + batchSize)
-
-      const batchResults = await Promise.all(
-        batch.map((kimlikNo) => queryIdentityNumber(kimlikNo))
-      )
-
-      setResults((prev) => [...prev, ...batchResults])
-
-      setStats((prev) => {
-        const completed = prev.completed + batchResults.length
-        const failed =
-          prev.failed +
-          batchResults.filter((r) => r.status === "Hata").length
-        const progress = (completed / prev.total) * 100
-        return { ...prev, completed, failed, progress }
-      })
-
-      if (i + batchSize < identityNumbers.length && delay > 0) {
-        await new Promise((resolve) => setTimeout(resolve, delay))
-      }
+    } finally {
+      setIsQuerying(false);
+      isQueryingRef.current = false;
+      setEndTime(new Date());
     }
-  } finally {
-    setIsQuerying(false)
-    isQueryingRef.current = false
-    setEndTime(new Date())
-  }
-}
-
+  };
 
   const pauseQuery = () => {
     setIsPaused((prev) => {
-      const next = !prev
-      isPausedRef.current = next
-      return next
-    })
-  }
+      const next = !prev;
+      isPausedRef.current = next;
+      return next;
+    });
+  };
 
   const stopQuery = () => {
-    setIsQuerying(false)
-    isQueryingRef.current = false
-    setIsPaused(false)
-    isPausedRef.current = false
-    setEndTime(new Date())
-  }
+    setIsQuerying(false);
+    isQueryingRef.current = false;
+    setIsPaused(false);
+    isPausedRef.current = false;
+    setEndTime(new Date());
+  };
 
   const handleExport = () => {
-    if (results.length === 0) return
-    exportToExcel(results)
-  }
+    if (results.length === 0) return;
+    exportToExcel(results);
+  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-    const reader = new FileReader()
+    const reader = new FileReader();
     reader.onload = (e) => {
-      const text = e.target?.result as string
-      setInputText(text)
-      parseIdentityNumbers(text)
-    }
-    reader.readAsText(file)
-  }
+      const text = e.target?.result as string;
+      setInputText(text);
+      parseIdentityNumbers(text);
+    };
+    reader.readAsText(file);
+  };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold">İkamet İzni Sorgulama Sistemi</h1>
+        <h1 className="text-3xl font-bold">
+          EGM Giriş/Çıkış Sorgulama Sistemi
+        </h1>
         <div className="flex justify-center gap-8 text-sm text-muted-foreground">
           <div>
-            <span className="font-medium">Sorgu Başlangıç Zamanı:</span> {startTime ? formatDateTime(startTime) : "-"}
+            <span className="font-medium">Sorgu Başlangıç Zamanı:</span>{" "}
+            {startTime ? formatDateTime(startTime) : "-"}
           </div>
           <div>
-            <span className="font-medium">Sorgu Bitiş Zamanı:</span> {endTime ? formatDateTime(endTime) : "-"}
+            <span className="font-medium">Sorgu Bitiş Zamanı:</span>{" "}
+            {endTime ? formatDateTime(endTime) : "-"}
           </div>
         </div>
       </div>
@@ -288,15 +283,13 @@ export default function HomePage() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Textarea
-              placeholder={`Kimlik numaralarını girin (her satıra bir numara veya virgülle ayırın)
+              placeholder={`Bilgileri girin (her satıra bir nesne veya virgülle ayırın)
 Örnek:
-12345678901
-98765432109
-11223344556`}
+{"egmCountryCode": "SRB", "passportNo": "123456789"}`}
               value={inputText}
               onChange={(e) => {
-                setInputText(e.target.value)
-                parseIdentityNumbers(e.target.value)
+                setInputText(e.target.value);
+                parseIdentityNumbers(e.target.value);
               }}
               rows={6}
               disabled={isQuerying}
@@ -311,12 +304,20 @@ export default function HomePage() {
                 <Upload className="w-4 h-4 mr-2" />
                 CSV/TXT Yükle
               </Button>
-              <input id="file-upload" type="file" accept=".csv,.txt" onChange={handleFileUpload} className="hidden" />
+              <input
+                id="file-upload"
+                type="file"
+                accept=".csv,.txt"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
             </div>
             <div className="text-sm text-muted-foreground">
               Geçerli kimlik numaraları: {identityNumbers.length} adet
               {inputText && identityNumbers.length === 0 && (
-                <span className="text-destructive ml-2">⚠️ Geçerli kimlik numarası bulunamadı (11 haneli olmalı)</span>
+                <span className="text-destructive ml-2">
+                  ⚠️ Geçerli kimlik numarası bulunamadı (11 haneli olmalı)
+                </span>
               )}
             </div>
           </div>
@@ -339,7 +340,11 @@ export default function HomePage() {
               <Input
                 type="number"
                 value={concurrency}
-                onChange={(e) => setConcurrency(Math.min(3, Math.max(1, Number(e.target.value))))}
+                onChange={(e) =>
+                  setConcurrency(
+                    Math.min(3, Math.max(1, Number(e.target.value)))
+                  )
+                }
                 min={1}
                 max={3}
                 disabled={isQuerying}
@@ -363,7 +368,9 @@ export default function HomePage() {
               <span>Başarısız: {stats.failed}</span>
             </div>
             <Progress value={stats.progress} className="w-full" />
-            <div className="text-center text-sm text-muted-foreground">%{stats.progress.toFixed(1)} tamamlandı</div>
+            <div className="text-center text-sm text-muted-foreground">
+              %{stats.progress.toFixed(1)} tamamlandı
+            </div>
           </CardContent>
         </Card>
 
@@ -376,12 +383,20 @@ export default function HomePage() {
               {!isQuerying ? (
                 <Button
                   onClick={() => {
-                   
                     startQuery().catch((error) => {
-                      console.error("[v0] Unhandled error in startQuery:", error)
-                      alert(`Beklenmeyen hata: ${error instanceof Error ? error.message : "Bilinmeyen hata"}`)
-                      setIsQuerying(false)
-                    })
+                      console.error(
+                        "[v0] Unhandled error in startQuery:",
+                        error
+                      );
+                      alert(
+                        `Beklenmeyen hata: ${
+                          error instanceof Error
+                            ? error.message
+                            : "Bilinmeyen hata"
+                        }`
+                      );
+                      setIsQuerying(false);
+                    });
                   }}
                   disabled={identityNumbers.length === 0}
                   className="flex-1"
@@ -391,11 +406,19 @@ export default function HomePage() {
                 </Button>
               ) : (
                 <>
-                  <Button onClick={pauseQuery} variant="outline" className="flex-1 bg-transparent">
+                  <Button
+                    onClick={pauseQuery}
+                    variant="outline"
+                    className="flex-1 bg-transparent"
+                  >
                     <Pause className="w-4 h-4 mr-2" />
                     {isPaused ? "Devam Et" : "Duraklat"}
                   </Button>
-                  <Button onClick={stopQuery} variant="destructive" className="flex-1">
+                  <Button
+                    onClick={stopQuery}
+                    variant="destructive"
+                    className="flex-1"
+                  >
                     <Square className="w-4 h-4 mr-2" />
                     Durdur
                   </Button>
@@ -425,5 +448,5 @@ export default function HomePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

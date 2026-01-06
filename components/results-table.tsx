@@ -23,7 +23,13 @@ export function ResultsTable({ results }: ResultsTableProps) {
                 <TableHead>Soyad</TableHead>
                 <TableHead>İzin Türü</TableHead>
                 <TableHead>Gerekçe</TableHead>
+                <TableHead>İzin Başlangıç Tarihi</TableHead>
                 <TableHead>İzin Bitiş Tarihi</TableHead>
+                <TableHead>Pasaport No</TableHead>
+                <TableHead>Pasaport Düzenleme Tarihi</TableHead>
+                <TableHead>Pasaport Geçerlilik Tarihi</TableHead>
+                <TableHead>Pasaport Veren Makam</TableHead>
+                <TableHead>Pasaport Veren Ülke</TableHead>
                 <TableHead>Durum</TableHead>
               </TableRow>
             </TableHeader>
@@ -37,7 +43,14 @@ export function ResultsTable({ results }: ResultsTableProps) {
                   <TableCell className="max-w-xs truncate" title={result.gerekce}>
                     {result.gerekce}
                   </TableCell>
+                  <TableCell>{result.izinBaslangicTarihi}</TableCell>
                   <TableCell>{result.izinBitisTarihi}</TableCell>
+                  <TableCell>{result.pasaportNo}</TableCell>
+                  <TableCell>{result.pasaportDuzenlemeTarihi}</TableCell>
+                  <TableCell>{result.pasaportGecerlilikTarihi}</TableCell>
+                  <TableCell>{result.pasaportVerenMakam}</TableCell>
+                  <TableCell>{result.pasaportVerenUlke}</TableCell>
+                  
                   <TableCell>
                     <Badge variant={result.status === "Başarılı" ? "default" : "destructive"}>{result.status}</Badge>
                   </TableCell>

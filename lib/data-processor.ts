@@ -16,8 +16,14 @@ export function processApiResponse(kimlikNo: string, response: ApiResponse): Que
       ykn: kimlikNo,
       ad: "Veri Yok",
       soyad: "Veri Yok",
+      pasaportNo: "Veri Yok",
+      pasaportDuzenlemeTarihi: "Veri Yok",
+      pasaportGecerlilikTarihi: "Veri Yok",
+      pasaportVerenMakam: "Veri Yok", 
+      pasaportVerenUlke:"Veri Yok",
       izinTuru: "Veri Yok",
       gerekce: `API Hatası: ${response.message || "Bilinmeyen hata"}`,
+      izinBaslangicTarihi: "Veri Yok",
       izinBitisTarihi: "Veri Yok",
       status: "Hata",
     }
@@ -103,12 +109,24 @@ export function processApiResponse(kimlikNo: string, response: ApiResponse): Que
     
   }
 
-  const result = {
+  const result:QueryResult  = {
     ykn,
     ad,
     soyad,
+    pasaportNo: kisi.pasaport?.belgeNo || "Veri Yok",
+    pasaportDuzenlemeTarihi: kisi.pasaport?.duzenlemeTarih
+      ? formatDate(kisi.pasaport.duzenlemeTarih)
+      : "Veri Yok",
+    pasaportGecerlilikTarihi: kisi.pasaport?.gecerlilikTarih
+      ? formatDate(kisi.pasaport.gecerlilikTarih)
+      : "Veri Yok",
+    pasaportVerenMakam: kisi.pasaport?.verenMakam || "Veri Yok",
+    pasaportVerenUlke: kisi.pasaport?.verenUlke || "Veri Yok",
     izinTuru,
     gerekce,
+    izinBaslangicTarihi: latestOzetRecord?.baslangicTarihi
+      ? formatDate(latestOzetRecord.baslangicTarihi)
+      : "Veri Yok",
     izinBitisTarihi,
     status: "Başarılı",
   }

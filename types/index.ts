@@ -2,8 +2,14 @@ export interface QueryResult {
   ykn: string
   ad: string
   soyad: string
+  pasaportNo: string
+  pasaportDuzenlemeTarihi: string
+  pasaportGecerlilikTarihi: string
+  pasaportVerenMakam: string 
+   pasaportVerenUlke:string
   izinTuru: string
   gerekce: string
+  izinBaslangicTarihi: string
   izinBitisTarihi: string
   status: "Başarılı" | "Hata"
 }
@@ -21,14 +27,26 @@ export interface ApiResponse {
   success: boolean
   message?: string
   data?: {
-    yabanciKimlikNo: string
-    ad: string
-    soyad: string
+    kisi:{
+      yabanciKimlikNo: string
+      ad: string
+      soyad: string
+      pasaport:{
+        belgeNo:string
+        duzenlemeTarih:string
+        gecerlilikTarih:string
+        verenMakam:string
+        verenUlke:string
+      }
+    },
     ikametOzetList: Array<{
       verilisNedeni: string
+      baslangicTarihi: string, // burayı eklemeyi unutma
+
       bitisTarihi: string
     }>
     ikametIzniBilgileriList: Array<{
+      baslangicTarihi: string
       bitisTarihi: string
       aileDestekleyiciTur?: number
       kisaDonemKalisNeden?: number
